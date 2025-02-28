@@ -1,10 +1,7 @@
 // pages/api/index.js
-export default function handler(req, res) {
-  const { name } = req.query;
 
-  if (name) {
-    res.status(200).json({ message: `Hello, ${name}!` });
-  } else {
-    res.status(400).json({ message: 'Name parameter is required' });
-  }
+export default function handler(req, res) {
+  const { name, age, method } = req.query;
+
+  res.status(200).json({message: `${name} u ${age} u ${method}`});
 }
