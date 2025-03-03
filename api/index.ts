@@ -1,7 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import { ZenStackMiddleware } from '@zenstackhq/server/express';
 import { RestApiHandler } from '@zenstackhq/server/api/rest';
-import express from 'express';
+import express, { Request, Response } from 'express';
+import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import { compareSync } from 'bcryptjs';
@@ -20,16 +21,17 @@ const prisma = new PrismaClient();
 const apiHandler = RestApiHandler({ endpoint: 'http://localhost:3000/api' });
 
 dotenv.config();
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const specPath = path.join(__dirname, '../resy-api.json');
+
+const spec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
+
 
 const options = { customCssUrl: 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.18.3/swagger-ui.css' };
-const spec = JSON.parse(
-    fs.readFileSync(path.resolve(__dirname.slice(3), '../resy-api.json'), 'utf8') 
-);
 app.use('/api/docs', swaggerUI.serve, swaggerUI.setup(spec, options));
 
-app.post('/api/login', async (req: Request, res: Response) => {
-
+app.post('/api/login', async (req: Request, res: Response): Promise<any> => {
     const { email, password } = req.body;
 
     const user = await prisma.user.findFirst({ where: { email } });
